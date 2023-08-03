@@ -1,10 +1,11 @@
 import { Box, useTheme } from "@mui/material";
+import { memo } from "react";
 
-interface CardProps {
+interface CardViewProps {
   imgSrc?: string;
 }
 
-const CardView = ({ imgSrc }: CardProps) => {
+const CardView = memo(({ imgSrc }: CardViewProps) => {
   const { palette, shape } = useTheme();
   return (
     <Box
@@ -18,6 +19,6 @@ const CardView = ({ imgSrc }: CardProps) => {
       {imgSrc && <img src={imgSrc} alt="Card" />}
     </Box>
   );
-};
+});
 
 export default CardView;

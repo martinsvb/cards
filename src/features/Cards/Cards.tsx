@@ -13,12 +13,15 @@ import CardView from "./CardView";
 import { Card } from "../../types/card";
 import { Draw } from "../../types/draw";
 import { initCards } from "./cardsInitData";
+import Match from "./Match";
+import MatchesView from "./MatchesView";
 
 const Cards = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCardLoading, setCardIsLoading] = useState(false);
   const [deck, setDeck] = useState<Deck | null>(null);
   const [cards, setCards] = useState<Card[]>(initCards);
+  const [remaining, setRemaining] = useState(0);
 
   useEffect(() => {
     const loadDeck = async () => {
@@ -33,6 +36,7 @@ const Cards = () => {
 
         const data = await response.json();
         setDeck(data);
+        setRemaining(data.remaining);
       } catch (error) {
         console.log({ error });
       } finally {
@@ -60,6 +64,7 @@ const Cards = () => {
         const data: Draw = await response.json();
         if (data?.cards.length) {
           setCards((prevCards) => [...prevCards, data.cards[0]]);
+          setRemaining(data.remaining);
         }
       } catch (error) {
         console.log({ error });
@@ -69,29 +74,43 @@ const Cards = () => {
     }
   }, [deck]);
 
+  const { images: firstImages, ...restFirstCard } = cards[cards.length - 2];
+  const { images: secondImages, ...restSecondCard } = cards[cards.length - 1];
+
   return (
     <Container maxWidth="md">
       <Stack alignContent="center" sx={{ pt: 4 }}>
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <>
-            <Stack direction="row" justifyContent="space-around" sx={{ my: 4 }}>
-              <CardView imgSrc={cards[cards.length - 2].images.png} />
-              <CardView imgSrc={cards[cards.length - 1].images.png} />
-            </Stack>
-            <LoadingButton
-              sx={{ alignSelf: "center" }}
-              loading={isCardLoading}
-              loadingPosition="start"
-              startIcon={<AddIcon />}
-              disabled={!deck?.deck_id}
-              onClick={drawCard}
-              variant="contained"
-            >
-              <span>Draw Card</span>
-            </LoadingButton>
-          </>
+          deck && (
+            <>
+              <Match firstCard={restFirstCard} secondCard={restSecondCard} />
+              <Stack
+                direction="row"
+                justifyContent="space-around"
+                sx={{ my: 4 }}
+              >
+                <CardView imgSrc={firstImages.png} />
+                <CardView imgSrc={secondImages.png} />
+              </Stack>
+              {!!remaining ? (
+                <LoadingButton
+                  sx={{ alignSelf: "center" }}
+                  loading={isCardLoading}
+                  loadingPosition="start"
+                  startIcon={<AddIcon />}
+                  disabled={!deck.deck_id}
+                  onClick={drawCard}
+                  variant="contained"
+                >
+                  <span>Draw Card</span>
+                </LoadingButton>
+              ) : (
+                <MatchesView />
+              )}
+            </>
+          )
         )}
       </Stack>
     </Container>
