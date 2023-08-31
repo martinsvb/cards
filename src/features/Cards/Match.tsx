@@ -6,6 +6,7 @@ import {
   increaseSuit,
   increaseValue,
 } from "../../rtk/slices/matches/matchesSlice";
+import { testingIds } from "../../config/tests/testingIds";
 
 interface MatchProps {
   firstCard: Omit<Card, "images">;
@@ -31,7 +32,11 @@ const Match = memo(({ firstCard, secondCard }: MatchProps) => {
 
   return (
     <Box sx={{ height: 40 }}>
-      <Typography variant="h4" textAlign="center">
+      <Typography
+        variant="h4"
+        textAlign="center"
+        data-testid={testingIds.matchText}
+      >
         {text}
       </Typography>
     </Box>
